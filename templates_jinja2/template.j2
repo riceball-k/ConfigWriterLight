@@ -1,0 +1,25 @@
+!
+! {{ filename }}
+! template:{{ template_filename }}
+!
+conf t
+!
+{{ hostname }}
+!
+{{ ipaddress }}/{{ mask }}
+!
+{% if hostname == 'Router' -%}
+ip routing
+{% else -%}
+mls qos
+{% endif -%}
+!
+{% for ip in snmp.split(',') -%}
+snmp-server {{ ip }}
+{% endfor -%}
+!
+{% for ip in ntp.split(',') -%}
+ntp-server {{ ip }}
+{% endfor -%}
+!
+end

@@ -6,14 +6,16 @@ Excelファイルからjinja2に渡すパラメータを読み込み、テンプ
 概要
 ----
 
-- Excelファイルからjinja2に渡すパラメータを読み込み、テンプレートからテキストファイルを出力する。
-- Excelファイルの1行目がjinja2の変数名となり、2行目以降を1行1ファイルのパラメータとして読み込む
-- カレントディレクトリにoutput_yyyymmdd_hhmmssのディレクトリを作成し、ファイルを出力する
-- 出力ファイル名は以下の通りとなる。
-  - Excelのパラメータに`filename`がある場合、`{{ filename }}.txt`を作成する
-  - 重複するファイル名が指定されていた場合は、`{{ filename }}_{{ n }}.txt`（nは2からインクリメント）を作成する
-  - Excelのパラメータにfilenameがない場合、`output.txt`を作成する
-  - filenameパラメータがあってもセルが空の場合、`None.txt`を作成する
+- ExcelファイルからJinjaに渡すパラメータを読み込み、テンプレートからテキストファイルを出力する
+- Excelファイルの1行目がJinjaの変数名となり、2行目以降を1行1ファイルのパラメータとして読み込む
+  - テンプレートファイル名は、変数`template_filename`に設定される
+  - `filename`もパラメータとして渡される
+  - Excelのセル設定によらず、すべての変数は文字列として渡される
+- カレントディレクトリに`output_yyyymmdd_hhmmss`のディレクトリを作成し、ファイルを出力する
+- 出力ファイル名は以下の通りとなる
+  - Excelの変数名に`filename`がある場合、`{{ filename }}.txt`を作成する
+  - 複数行でファイル名が重複する場合は、`{{ filename }}_n.txt`（nは2からインクリメント）を作成する
+  - 変数名に`filename`がない場合または`filename`が空の場合、filenameには`None`が指定されたものと扱う
 
 必要なモジュール
 ----------------
@@ -21,11 +23,6 @@ Excelファイルからjinja2に渡すパラメータを読み込み、テンプ
 - jinja2
 - openpyxl
 
-```
-> pip install jinja2
-> pip install openpyxl
->
-```
 
 使用方法
 --------
@@ -38,9 +35,8 @@ Excelファイルからjinja2に渡すパラメータを読み込み、テンプ
 
 - 数式の入ったセルの場合、最終の計算結果が利用される（openpyxlの仕様）
 - 変数名が空欄の場合、'None'という変数名として定義される
+- セルが空欄の場合、'None' が設定される
 - 同一変数名がある場合は、最も右側の列のパラメータが有効となる
-- 使用したjinja2テンプレートのファイル名は、`template_filename`として渡される
-- `filename`もパラメータとして渡される
 
 実行例
 ------
@@ -68,6 +64,12 @@ conf t
 !
 {{ ipaddress }}/{{ mask }}
 !
+{% if hostname == 'Router' -%}
+ip routing
+{% else -%}
+mls qos
+{% endif -%}
+!
 {% for ip in snmp.split(',') -%}
 snmp-server {{ ip }}
 {% endfor -%}
@@ -91,6 +93,8 @@ conf t
 Router
 !
 192.168.1.1/24
+!
+ip routing
 !
 snmp-server 10.253.254.35
 snmp-server 10.253.254.37
