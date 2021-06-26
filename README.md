@@ -1,5 +1,5 @@
-config_writer_light.py
-======================
+Config Writer Light
+===================
 
 Excelファイルからjinja2に渡すパラメータを読み込み、テンプレートからテキストファイルを出力する。
 
